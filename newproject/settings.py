@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'blog',
+    'status'
 ]
 
 MIDDLEWARE = [
@@ -133,5 +135,7 @@ STATICFILES_DIRS = (
 
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = os.path.join(BASE_DIR,'static-server','media-root') #to save images
 
+MEDIA_URL = '/media/'
 

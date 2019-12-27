@@ -6,7 +6,7 @@ from django.core.serializers import serialize
 # Create your models here.
 
 def upload_update_image(instance,filename):
-	return "updates/{user}/{filename}".format(user=instance.user,filename=filename)
+	return "blog/{user}/{filename}".format(user=instance.user,filename=filename)
 
 
 class UserProfileQuerySet(models.QuerySet):
