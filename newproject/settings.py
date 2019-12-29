@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'blog',
-    'status'
+    'status',
+    'accounts'
 ]
 
 MIDDLEWARE = [
@@ -139,3 +140,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'static-server','media-root') #to save images
 
 MEDIA_URL = '/media/'
 
+from .restconf.main import *

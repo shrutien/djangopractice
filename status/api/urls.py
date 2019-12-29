@@ -9,12 +9,14 @@ from .views import(
                 MixinCreateListSearchAPIView,
                 MixinUpdateDeleteAPIView,
                 UserStatusDetailAPIView,
-                UserStatusAllAPIView)      
+                UserStatusAllAPIView,
+                UserPermissionCreateListAPIView)      
 
 
 urlpatterns = [      
     url(r'^$', ListSearchAPIView.as_view()),
     url(r'^all_data/$', UserStatusAllAPIView.as_view()),
+    url(r'^user_permission_list/$', UserPermissionCreateListAPIView.as_view()),
     url(r'^create/$', StatusCreateAPIView.as_view()),
     url(r'^mixin_create/$', MixinCreateListSearchAPIView.as_view()),
     url(r'^detail/(?P<id>\d+)/$', StatusDetailAPIView.as_view()),

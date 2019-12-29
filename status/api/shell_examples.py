@@ -80,8 +80,9 @@ class UserStatusSerializer(serializers.Serializer):
         return instance
 
 new_updated_data = {'content': 'some new data', 'title':'new title', 'user': 1}
+qs = UserStatusUpload.objects.first()
 # .save() will create a new instance. 
 serializer = UserStatusSerializer(data=new_updated_data)
 
 # .save() will update the existing `comment` instance.
-serializer = UserStatusSerializer(comment, data=new_updated_data)
+serializer = UserStatusSerializer(qs, data=new_updated_data)

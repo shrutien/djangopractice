@@ -1,13 +1,16 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.authentication import SessionAuthentication
+from rest_framework import permissions
 from rest_framework import generics, mixins
 from rest_framework.views import APIView
 from rest_framework.response import Response 
 from .serializers import UserStatusSerializer
 from status.models import UserStatusUpload
+from status.api.permissions import IsOwnerOrReadOnly
 
 class StatusListSearchAPIView(APIView):
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	
 
 	def get(self,request,format=None):
@@ -25,8 +28,8 @@ class StatusListSearchAPIView(APIView):
 class ListSearchAPIView(generics.ListAPIView):
 	#Example API EndPoint: http://127.0.0.1:8008/api/status/?q=test
 
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	# queryset = UserStatusUpload.objects.all()
 
@@ -42,8 +45,8 @@ class ListSearchAPIView(generics.ListAPIView):
 	
 
 class StatusCreateAPIView(generics.CreateAPIView):
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	queryset = UserStatusUpload.objects.all()
 
@@ -53,8 +56,8 @@ class StatusCreateAPIView(generics.CreateAPIView):
 
 
 class StatusDetailAPIView(generics.RetrieveAPIView):
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	# queryset = UserStatusUpload.objects.all()	
 	lookup_field = 'id' # or 'slug'
@@ -69,8 +72,8 @@ class StatusDetailAPIView(generics.RetrieveAPIView):
 
 
 class StatusUpdateAPIView(generics.UpdateAPIView):
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	queryset = UserStatusUpload.objects.all()	
 	lookup_field = 'id' # or 'slug'
@@ -79,8 +82,8 @@ class StatusUpdateAPIView(generics.UpdateAPIView):
 
 
 class StatusDeleteAPIView(generics.DestroyAPIView):
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	queryset = UserStatusUpload.objects.all()	
 	lookup_field = 'id' # or 'slug'
@@ -97,8 +100,8 @@ class MixinCreateListSearchAPIView(mixins.CreateModelMixin,generics.ListAPIView)
 	To create and display all the data.
 	'''
 
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 
 	#SearchQuery
@@ -120,8 +123,8 @@ class MixinUpdateDeleteAPIView(mixins.UpdateModelMixin,mixins.DestroyModelMixin,
 	To Update and delete the object.
 	'''
 
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	queryset = UserStatusUpload.objects.all()
 	lookup_field = 'id' #or 'slug'
@@ -139,8 +142,8 @@ class UserStatusDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 	'''
 	To Update and delete the object.
 	'''
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	queryset = UserStatusUpload.objects.all()
 	lookup_field = 'id' #or 'slug'
@@ -153,8 +156,8 @@ class UserStatusAllAPIView(mixins.CreateModelMixin,mixins.RetrieveModelMixin,mix
 	CRUD - Using all the Mixins.
 	'''
 
-	permission_classes = []
-	authentication_classes = []
+	# permission_classes = []
+	# authentication_classes = []
 	serializer_class = UserStatusSerializer
 	lookup_field = 'id' #or 'slug'
 
@@ -198,3 +201,34 @@ class UserStatusAllAPIView(mixins.CreateModelMixin,mixins.RetrieveModelMixin,mix
 
 	def delete(self,request,*args,**kwargs):
 		return self.destroy(request,*args,**kwargs)
+
+
+#Permission Classes
+
+
+class UserPermissionCreateListAPIView(mixins.CreateModelMixin,generics.ListAPIView):
+	#Example API EndPoint: http://127.0.0.1:8008/api/status/mixin_create/?q=test
+
+	'''
+	To create and display all the data. Including Permission and Authentication Classes
+	'''
+
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly] #checks if it is authenticated(logged in) anonymous user read only(GET)
+	# authentication_classes = [SessionAuthentication] #checks the type of authentication (OAUTH,JWT)
+	serializer_class = UserStatusSerializer
+
+	#SearchQuery
+	def get_queryset(self):
+		qs = UserStatusUpload.objects.all()
+		value = self.request.GET.get('q')
+		if value is not None:
+			qs =qs.filter(content__icontains=value)
+		return qs
+
+
+	def post(self, request,*args,**kwargs):
+		return self.create(request,*args,**kwargs)
+
+
+	def perform_create(self, serializer):		
+		serializer.save(user=self.request.user)
