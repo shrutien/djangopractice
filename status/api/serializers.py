@@ -1,12 +1,14 @@
 from rest_framework import serializers
 from status.models import UserStatusUpload
+from accounts.api.serializers import UserSerializer 
 
 class UserStatusSerializer(serializers.ModelSerializer):
+	user = UserSerializer(read_only=True) #Nested Serializer TEST API ENDPOINT: /api/status/user_permission_list/
+
 	class Meta:
 		model = UserStatusUpload
-		fields = [
-			'id',
-			'user',
+		fields = [	
+			'user',		
 			'content',
 			'title',
 			'upload_image'

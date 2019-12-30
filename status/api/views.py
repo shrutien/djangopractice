@@ -3,6 +3,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework import permissions
 from rest_framework import generics, mixins
 from rest_framework.views import APIView
+from rest_framework import pagination
 from rest_framework.response import Response 
 from .serializers import UserStatusSerializer
 from status.models import UserStatusUpload
@@ -41,8 +42,38 @@ class ListSearchAPIView(generics.ListAPIView):
 			qs =qs.filter(content__icontains=value)
 		return qs
 
+#Serializer Form 
 
+# class UserDetail(APIView):
+#     renderer_classes = [TemplateHTMLRenderer]
+#     template_name = 'your_template.html'
+
+#     def get(self, request, pk):
+#         serializer = UserSerializer(profile)
+#         return Response({'serializer': serializer})
+
+#     def post(self, request, pk):
+#         user = get_object_or_404(User, pk=pk)
+#         serializer = UserSerializer(data=request.data)
+#         if not serializer.is_valid():
+#             return Response({'serializer': serializer})
+#         serializer.save()
+#         return redirect('some_url_name')  
 	
+
+# Serializer Template Form
+# link: https://www.django-rest-framework.org/topics/html-and-forms/#field-styles
+# {% load rest_framework %}
+# <html><body>
+
+#    <form action="{% url 'user_url' pk=user.pk %}" method="POST">
+#         {% csrf_token %}
+#         {% render_form serializer template_pack='rest_framework/vertical' %} #Serializerform ex: {{ form.as_p }}
+#         <input type="submit" value="Save">
+#     </form>
+
+# </body></html>
+
 
 class StatusCreateAPIView(generics.CreateAPIView):
 	# permission_classes = []
@@ -203,8 +234,12 @@ class UserStatusAllAPIView(mixins.CreateModelMixin,mixins.RetrieveModelMixin,mix
 		return self.destroy(request,*args,**kwargs)
 
 
-#Permission Classes
+class CustomAPIPagination(pagination.PageNumberPagination):
+	page_size = 4
 
+
+
+#Permission Classes
 
 class UserPermissionCreateListAPIView(mixins.CreateModelMixin,generics.ListAPIView):
 	#Example API EndPoint: http://127.0.0.1:8008/api/status/mixin_create/?q=test
@@ -216,6 +251,8 @@ class UserPermissionCreateListAPIView(mixins.CreateModelMixin,generics.ListAPIVi
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly] #checks if it is authenticated(logged in) anonymous user read only(GET)
 	# authentication_classes = [SessionAuthentication] #checks the type of authentication (OAUTH,JWT)
 	serializer_class = UserStatusSerializer
+
+	pagination_class = CustomAPIPagination #Pagination
 
 	#SearchQuery
 	def get_queryset(self):
